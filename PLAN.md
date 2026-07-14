@@ -108,7 +108,7 @@ tennis-video-analyzer/
 
 ## Week 1 — Video → poses (the data pipeline)
 
-- [ ] **Day 1** — Repo scaffolding: package layout, venv, requirements, ruff, pytest, CI workflow, .gitignore. First green CI run.
+- [x] **Day 1** — Repo scaffolding: package layout, venv, requirements, ruff, pytest, CI workflow, .gitignore. First green CI run.
 - [ ] **Day 2** — Video module: load video, extract frames, resample to fixed FPS. Tests for edge cases (portrait video, odd codecs).
 - [ ] **Day 3** — MediaPipe integration: keypoints per frame, visibility handling, draw skeleton overlay on video (first cool visual — save a clip).
 - [ ] **Day 4** — Keypoint normalization: center on hip, scale by torso length, mirror left-handed players. Critical for generalization — document the math in docstrings.
