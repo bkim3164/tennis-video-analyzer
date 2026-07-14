@@ -1,6 +1,8 @@
 # Tennis Video Analyzer — Project Plan
 
-Upload a clip of your forehands/backhands → pose-based neural network classifies each stroke, scores it against expert technique, and returns concrete feedback with an annotated video. Full-stack: React frontend, FastAPI backend, videos stored in AWS S3.
+Upload a clip of a pro tennis player's forehands/backhands → pose-based neural network classifies each stroke, scores it against expert technique, and returns concrete feedback with an annotated video. Full-stack: React frontend, FastAPI backend, videos stored in AWS S3.
+
+**v1 scope:** analyze clips of pro players (practice-court/baseline-view footage where the player fills the frame works best). **Phase 2 (next month):** extend to analyzing your own gameplay.
 
 **Timeline:** 4 weeks, ~1–2 hrs/day · **Training hardware:** laptop (CPU-friendly by design) · **Repo:** [bkim3164/tennis-video-analyzer](https://github.com/bkim3164/tennis-video-analyzer)
 
@@ -112,7 +114,7 @@ tennis-video-analyzer/
 - [ ] **Day 2** — Video module: load video, extract frames, resample to fixed FPS. Tests for edge cases (portrait video, odd codecs).
 - [ ] **Day 3** — MediaPipe integration: keypoints per frame, visibility handling, draw skeleton overlay on video (first cool visual — save a clip).
 - [ ] **Day 4** — Keypoint normalization: center on hip, scale by torso length, mirror left-handed players. Critical for generalization — document the math in docstrings.
-- [ ] **Day 5** — Stroke segmentation: detect swings via wrist-speed peaks + smoothing; extract fixed-length windows around contact. Test on a video of yourself.
+- [ ] **Day 5** — Stroke segmentation: detect swings via wrist-speed peaks + smoothing; extract fixed-length windows around contact. Test on a pro player clip.
 - [ ] **Day 6** — THETIS download script + preprocessing: run the pose pipeline over the dataset, cache keypoint sequences as `.npz`. (Kick off, let it run.)
 - [ ] **Day 7** — EDA notebook: expert vs. beginner trajectories, class balance, sequence lengths. Sanity-check the cache. **Milestone: video in → clean labeled sequences out.**
 
@@ -129,12 +131,12 @@ tennis-video-analyzer/
 ## Week 3 — ExpertScorer + feedback
 
 - [ ] **Day 15** — ExpertScorer: reuse backbone, binary expert/beginner head. Train.
-- [ ] **Day 16** — Score calibration per stroke class; sanity-check on your own footage (you should land between beginner and expert!).
+- [ ] **Day 16** — Score calibration per stroke class; sanity-check on pro clips (should score near the expert end) vs. THETIS beginner clips (should score low).
 - [ ] **Day 17** — Joint-angle module: elbow/shoulder/hip/knee angles over time. Well-tested, well-commented — portfolio-grade geometry code.
 - [ ] **Day 18** — Swing-phase detection (preparation/contact/follow-through) + expert reference curves per phase from THETIS experts.
 - [ ] **Day 19** — Feedback generator: top-3 deviations from expert reference → plain-English tips with numbers.
 - [ ] **Day 20** — End-to-end CLI: `tennis-analyzer analyze my_clip.mp4` → annotated video + markdown report.
-- [ ] **Day 21** — Test on fresh videos of yourself; fix segmentation/scoring issues found in the wild. **Milestone: full pipeline works on your own footage.**
+- [ ] **Day 21** — Test on fresh pro player clips (different players, courts, camera angles); fix segmentation/scoring issues found in the wild. **Milestone: full pipeline works on real pro footage.**
 
 ## Week 4 — Backend + frontend, polish, ship
 
@@ -142,7 +144,7 @@ tennis-video-analyzer/
 - [ ] **Day 23** — Analysis endpoints: `POST /analyze` (background task: S3 download → ML pipeline → annotated video to S3 + results to DynamoDB), `GET /jobs/{id}`. API tests with moto (mocked AWS).
 - [ ] **Day 24** — Frontend scaffold: Vite + React + Tailwind, upload dropzone → presigned S3 upload → job polling with progress state.
 - [ ] **Day 25** — Results dashboard: annotated video player (presigned GET), per-stroke score gauges, Recharts joint-angle plots vs. expert reference, feedback cards.
-- [ ] **Day 26** — End-to-end integration on real footage; error states (bad video, no strokes detected); UI polish.
+- [ ] **Day 26** — End-to-end integration on real pro clips; error states (bad video, no strokes detected); UI polish.
 - [ ] **Day 27** — README overhaul: demo GIF, both architecture diagrams, quickstart (incl. AWS setup), results table, limitations section. Docstrings + type hints sweep, final ruff/pytest/ESLint pass.
 - [ ] **Day 28** — Record demo GIF; tag `v1.0.0`. Buffer overflow-day if anything slipped.
 
@@ -161,14 +163,10 @@ Recruiters and interviewers *do* look at commit history — a healthy one is par
 
 ## Risks & mitigations
 
-- **THETIS videos are 640×480 Kinect-era** → MediaPipe still tracks fine; your phone footage will be *better* than the training data. Test early (Day 6).
+- **THETIS videos are 640×480 Kinect-era** → MediaPipe still tracks fine; test early (Day 6).
+- **Broadcast pro footage is the hard case** → far-court camera angles make the player small in frame, and match broadcasts show two players plus crowd (MediaPipe tracks one person). Prefer practice-court/baseline-view clips where the player fills the frame; add a crop/person-selection step if needed. This is also why "analyze your own gameplay" (phase 2) may end up *easier* — you control the camera.
 - **Stroke segmentation is the flakiest part** → keep a manual "trim to one stroke" fallback in the app.
-- **Domain gap (THETIS lab setting vs. your court)** → normalization (Day 4) is the defense; validate on your own clips at every milestone.
+- **Domain gap (THETIS lab setting vs. real courts)** → normalization (Day 4) is the defense; validate on pro clips at every milestone.
 - **12-class accuracy disappoints** → collapsing to 4–6 classes is fine and still impressive.
 - **AWS bill anxiety** → S3 + DynamoDB free tiers cover this easily at personal scale; set a $5 billing alarm on day one and add a lifecycle rule to auto-delete uploads after 30 days.
-- **Week 4 is packed** → the Day 20 CLI is the safety net; the web stack can spill over without breaking the milestone chain.
-
-## Resume bullets this project earns
-
-- Built a full-stack tennis stroke analysis app: React/TypeScript frontend, FastAPI backend with S3 presigned-URL video uploads and DynamoDB job tracking, and PyTorch neural networks (stroke classification at X%, expert-technique scoring) trained on 1,900+ labeled videos.
-- Designed a pose-sequence ML pipeline (MediaPipe, OpenCV) with player-level data splits, augmentation, and baseline comparisons; CI-tested (pytest, GitHub Actions) and fully documented.
+- **We
