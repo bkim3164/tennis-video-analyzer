@@ -1,0 +1,11 @@
+# Core ML pipeline
+# numpy pinned <2.0 for mediapipe binary compatibility
+numpy>=1.26,<2.0
+pandas>=2.1
+opencv-python>=4.9
+mediapipe>=0.10.14
+torch>=2.2
+pyyaml>=6.0
+
+# Experiment tracking
+tensorboard>=2.16

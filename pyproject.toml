@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tennis-analyzer"
+version = "0.1.0"
+description = "Pose-based neural network analysis of tennis strokes with technique feedback"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [{ name = "Brian Kim", email = "bkim3164@gmail.com" }]
+
+[project.scripts]
+tennis-analyzer = "tennis_analyzer.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+# E/F: pycodestyle + pyflakes, I: import order, UP: modern syntax,
+# B: bugbear, SIM: simplifications, D: docstrings (Google style)
+select = ["E", "F", "I", "UP", "B", "SIM", "D"]
+ignore = [
+    "D203", # one-blank-line-before-class (conflicts with D211)
+    "D213", # multi-line-summary-second-line (conflicts with D212)
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D"] # tests don't need docstrings
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
