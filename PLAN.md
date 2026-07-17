@@ -169,4 +169,9 @@ Recruiters and interviewers *do* look at commit history — a healthy one is par
 - **Domain gap (THETIS lab setting vs. real courts)** → normalization (Day 4) is the defense; validate on pro clips at every milestone.
 - **12-class accuracy disappoints** → collapsing to 4–6 classes is fine and still impressive.
 - **AWS bill anxiety** → S3 + DynamoDB free tiers cover this easily at personal scale; set a $5 billing alarm on day one and add a lifecycle rule to auto-delete uploads after 30 days.
-- **We
+- **Week 4 is packed** → the Day 20 CLI is the safety net; the web stack can spill over without breaking the milestone chain.
+
+## Resume bullets this project earns
+
+- Built a full-stack tennis stroke analysis app: React/TypeScript frontend, FastAPI backend with S3 presigned-URL video uploads and DynamoDB job tracking, and PyTorch neural networks (stroke classification at X%, expert-technique scoring) trained on 1,900+ labeled videos.
+- Designed a pose-sequence ML pipeline (MediaPipe, OpenCV) with player-level data splits, augmentation, and baseline comparisons; CI-tested (pytest, GitHub Actions) and fully documented.
