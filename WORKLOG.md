@@ -2,6 +2,22 @@
 
 Daily development log for the tennis-video-analyzer project. Newest entries first. See PLAN.md for the full roadmap.
 
+## Day 3 — 2026-07-20 — MediaPipe pose estimation + skeleton overlay
+
+Wired the "vision" stage of the pipeline:
+
+- `pose/landmarks.py` — the 33-landmark BlazePose topology as a MediaPipe-free constants module (`Landmark` enum + `SKELETON_CONNECTIONS`), so drawing and future joint-angle code never import MediaPipe
+- `pose/estimator.py` — `PoseEstimator` wrapping the MediaPipe **Tasks** `PoseLandmarker` in VIDEO mode (temporal tracking between frames); output is `(T, 33, 3)` float32 of `(x, y, visibility)`, with undetected frames as `(NaN, NaN, 0.0)` so downstream code masks them explicitly
+- `ensure_model()` — lazy download of the ~5 MB `pose_landmarker_lite.task` asset into `~/.cache/tennis-analyzer` (override via `$TENNIS_ANALYZER_CACHE`), pinned to a fixed model version
+- `video/annotate.py` — pure-rendering skeleton overlay (`draw_skeleton`, `annotate_frames`), `write_video`, and an end-to-end `annotate_video(in, out)` convenience chaining load → pose → draw → write
+- 23 tests: landmark topology invariants (contiguity, left/right symmetry), drawing behavior (visibility threshold, no-detection no-op, out-of-frame clipping), video write round-trip; estimator inference tests auto-skip where the model can't be downloaded and run in CI
+
+Decisions: Tasks API over the legacy `mp.solutions.pose` (removed from MediaPipe ≥0.10.30-era wheels, so pinning old MediaPipe would be a dead end); `num_poses=1` since v1 targets single-player practice clips; model asset cached outside the repo rather than committed.
+
+Deferred: saving an annotated demo clip of a real pro stroke — needs real footage and the model download, both unavailable in this environment. One-liner once local: `python -c "from tennis_analyzer.video import annotate_video; annotate_video('clip.mp4', 'annotated.mp4')"`.
+
+Commits: `68b914c` feat (estimator), `595d198` feat (overlay), `886637b` test, plus docs commit.
+
 ## Day 2 — 2026-07-19 — Video I/O module
 
 Built `src/tennis_analyzer/video/io.py`, the first pipeline stage:
